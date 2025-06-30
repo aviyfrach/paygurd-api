@@ -27,13 +27,24 @@ async def extract_payslip(file: UploadFile = File(...)):
     try:
        from openai import OpenAI
 
-client = OpenAI()
+try:
+    from openai import OpenAI
 
-response = client.chat.completions.create(
-    model="gpt-4",
-    messages=messages,
-    temperature=0,
-)
-        return JSONResponse(content=response.choices[0].message.content)
+    client = OpenAI()
+    response = client.chat.completions.create(
+        model="gpt-4",
+        messages=messages,
+        temperature=0,
+    )
+
+    return JSONResponse(content=response.choices[0].message.content)
+
+except Exception as e:
+    raise HTTPException(status_code=500, detail=str(e))
+
+    return JSONResponse(content=response.choices[0].message.content)
+
+except Exception as e:
+    raise HTTPException(status_code=500, detail=str(e))        return JSONResponse(content=response.choices[0].message.content)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
