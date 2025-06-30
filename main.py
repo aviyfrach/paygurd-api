@@ -31,7 +31,7 @@ async def extract_payslip(file: UploadFile = File(...)):
     try:
         client = OpenAI(api_key=openai_api_key)
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo"
             messages=messages,
             temperature=0,
         )
