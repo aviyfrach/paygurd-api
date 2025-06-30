@@ -8,7 +8,6 @@ app = FastAPI()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 PROMPT = """חילוץ שכר בפורמט טקסטואלי (עברית), מחוץ למסמך וכל מה שתשאיר אוכל — הפרומפט כל פעם ממשיך כאן"""
-\"\"\"
 def extract_text_from_pdf(file_path):
     text = ""
     with fitz.open(file_path) as doc:
