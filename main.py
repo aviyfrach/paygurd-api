@@ -25,12 +25,15 @@ async def extract_payslip(file: UploadFile = File(...)):
     text = extract_text_from_pdf(path)
     messages = [{"role": "system", "content": PROMPT}, {"role": "user", "content": text}]
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4o",
-            messages=messages,
-            temperature=0,
-            response_format="json"
-        )
+       from openai import OpenAI
+
+client = OpenAI()
+
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=messages,
+    temperature=0,
+)
         return JSONResponse(content=response.choices[0].message.content)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
