@@ -7,7 +7,7 @@ from openai import OpenAI
 app = FastAPI()
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
-PROMPT = """תשאיר אוכל — הפרומפט כל פעם ממשיך כאן"""
+PROMPT = """חילוץ שכר בפורמט טקסטואלי — תמשיך כל פעם מהפעם הקודמת כאן"""
 
 def extract_text_from_pdf(file_path):
     text = ""
@@ -19,15 +19,15 @@ def extract_text_from_pdf(file_path):
 @app.post("/extract-payslip")
 async def extract_payslip(file: UploadFile = File(...)):
     if not file.filename.endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="Only PDF files are supported.")
-
+        raise HTTPException(status_code=400, detail="יש להעלות קובץ PDF בלבד.")
+    
     path = f"/tmp/{file.filename}"
     with open(path, "wb") as f:
         f.write(await file.read())
 
     text = extract_text_from_pdf(path)
     messages = [{"role": "system", "content": PROMPT + text}]
-
+    
     try:
         client = OpenAI(api_key=openai_api_key)
         response = client.chat.completions.create(
@@ -36,6 +36,5 @@ async def extract_payslip(file: UploadFile = File(...)):
             temperature=0,
         )
         return JSONResponse(content=response.choices[0].message.content)
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
