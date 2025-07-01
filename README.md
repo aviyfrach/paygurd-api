@@ -1,1 +1,0 @@
-# paygurd-api
