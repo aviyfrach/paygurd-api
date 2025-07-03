@@ -122,7 +122,4 @@ const prompt = `
 
 export default prompt;
 
-`;
-
-export default prompt;
 
