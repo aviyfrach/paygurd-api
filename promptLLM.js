@@ -10,7 +10,7 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 6. If a field appears multiple times – extract only the first valid line that is not part of a "הפרש" or adjustment section.
 7. Completely ignore any line that includes the word "הפרש" or "הפרשים".
 8. Ignore lines that contain a date range, such as "01.25–04.25".
-9. If the line contains more than 4 numeric values – discard it unless explicitly valid (see שעות נוספות below).
+9. If the line contains more than 4 numeric values – discard it unless explicitly valid.
 10. All field keys must be in Hebrew only.
 11. All fields in the final output must be present – if a value is not found, return 0 for that key.
 12. Never extract values that are equal to the code (e.g., 1100 as value).
@@ -22,30 +22,30 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 🕒 שעות נוספות:
 - שעות נוספות 100% (code 1100):
   - Must appear in same line as value.
+  - Line must contain 3 or 4 numeric values.
   - If 3 values → return the middle.
   - If 4 values → reverse line and return third from left.
-  - If 5 values → discard (not supported for 1100).
   - Value must be < 200, not a rate, not from "הפרשים" or with date range.
   - If not found – return 0.
 
 - שעות נוספות 125% (code 1125):
-  - If 5 numeric values in line – return the rightmost value (first column from right) = quantity.
-  - If 3 values – return the middle.
-  - If 4 values – reverse line and return third from left.
-  - Skip invalid or adjustment rows.
-  - Must be under 200.
+  - Same logic as above with code 1125.
+  - First valid non-adjustment line only.
   - If not found – return 0.
 
 - שעות נוספות 150% (code 1150):
-  - Same logic as 1125.
-  - First valid non-adjustment line only.
-  - Must be numeric and < 200.
+  - Same logic as above with code 1150.
+  - If multiple 1150 lines found, take only the first valid non-adjustment one.
   - If not found – return 0.
 
 🟨 ערך שעה:
-- Extract only from line that includes both "004/" and "ערך שעה".
-- Do not extract from lines with "002" or "ערך יום".
-- Value must be between 30 and 200.
+- Look for any row (even if values are separated by tabs or spaces) that contains both:
+  - The code "004" (with or without slash, e.g., "004", "004/")
+  - The phrase "ערך שעה"
+- These can appear in the same line, in adjacent columns, or even as a combined string like: "004/51.55 ערך שעה".
+- From that row or combined string, extract the only numeric value between 30–200 that is not the code itself.
+- Do not extract if the line also contains "002" or "ערך יום".
+- Use only the first valid match.
 - If not found – return 0.
 
 💰 שכר יסוד:
@@ -133,6 +133,7 @@ The response must be valid JSON with no explanations, no formatting issues, and 
 `;
 
 export default prompt;
+
 
 
 
