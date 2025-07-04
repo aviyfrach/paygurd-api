@@ -9,7 +9,7 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 5. Do not return the component code itself (e.g., 1100) as value.
 6. If a field appears multiple times – extract only the first valid line that is not part of a "הפרש" or adjustment section.
 7. Completely ignore any line that includes the word "הפרש" or "הפרשים".
-8. Ignore lines that contain a date range, such as "01.25–04.25".
+8. Ignore lines that contain a date range, such as "01.25–04.25", "03.25–06.25", or any DD.MM–DD.MM format.
 9. If the line contains more than 4 numeric values – discard it unless explicitly valid.
 10. All field keys must be in Hebrew only.
 11. All fields in the final output must be present – if a value is not found, return 0 for that key.
@@ -22,27 +22,27 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 🕒 שעות נוספות:
 - שעות נוספות 100% (code 1100):
   - Must appear in same line as value.
+  - Ignore if line contains date range or "הפרשים".
   - Line must contain 3 or 4 numeric values.
   - If 3 values → return the middle.
   - If 4 values → reverse line and return third from left.
-  - Value must be < 200, not a rate, not from "הפרשים" or with date range.
+  - Value must be < 200 and not a rate.
   - If not found – return 0.
 
 - שעות נוספות 125% (code 1125):
   - Same logic as above with code 1125.
-  - First valid non-adjustment line only.
+  - Extract only from the first valid non-adjustment line.
   - If not found – return 0.
 
 - שעות נוספות 150% (code 1150):
   - Same logic as above with code 1150.
-  - If multiple 1150 lines found, take only the first valid non-adjustment one.
+  - If multiple 1150 lines exist, extract only the first valid one that is not in a "הפרשים" or date range line.
   - If not found – return 0.
 
 🟨 ערך שעה:
-- Extract only from line that includes both "004/" and "ערך שעה".
+- Extract only from the first line that includes both "004/" and "ערך שעה".
 - Do not extract from lines with "002" or "ערך יום".
 - Value must be between 30 and 200.
-- Use only the first valid line.
 - If not found – return 0.
 
 💰 שכר יסוד:
@@ -51,7 +51,8 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 
 📌 גמול חיפוש:
 - Extract quantity from line containing code "1023".
-- Must not be from adjustment section.
+- Must not be from a line that includes "הפרש" or a date range.
+- Only if quantity exists.
 - If not found – return 0.
 
 📌 פרמיה:
@@ -91,8 +92,8 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 
 🎯 נקודות זיכוי:
 - Locate the row "נ. זיכוי" in the monthly summary table.
-- Match value under column matching current month number (e.g., "04" for April).
-- Value must be numeric between 0–12.
+- Match the value in the column with the exact month number (e.g., "04" for April).
+- Value must be numeric and between 0–12.
 - If not found – return 0.
 
 📅 ותק:
