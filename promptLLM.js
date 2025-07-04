@@ -13,6 +13,9 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 9. All fields in the final output must be present – if a value is not found, return 0 for that key.
 10. Never extract values that are equal to the code (e.g., 1100 as value).
 11. Always validate the value is below 200 for any overtime quantity field.
+12. Completely ignore any line that includes the word "הפרש" or "הפרשים" – even if it includes a valid code like 1100.
+13. Do not extract any values from "נסיעות", "רכב", "הבראה", "זקיפות", or any field with unclear or ambiguous label.
+14. Each key must be returned exactly once, and always with a numeric value.
 
 🕒 שעות נוספות:
 - שעות נוספות 100% (code 1100):
@@ -20,6 +23,7 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
   - If line has 3 numbers → return middle.
   - If line has 4 → reverse and return third from left.
   - Must be numeric, < 200, and not a rate or total.
+  - Ignore if value is near hourly/daily rate.
   - If not found – return 0.
 
 - שעות נוספות 125% (code 1125):
@@ -44,6 +48,7 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 
 📌 גמול חיפוש:
 - Extract quantity from line containing code "1023".
+- Only numeric quantity column.
 - If not found – return 0.
 
 📌 פרמיה:
@@ -53,23 +58,27 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 
 📌 כוננות:
 - Extract value from code 1205.
+- Only from value column.
 - If missing – return 0.
 
 🏦 ברוטו לפנסיה:
 - Extract from line containing code "165" or "165/".
-- Do not extract if line contains רכב or הפקדה.
+- Do not extract if line contains רכב, נסיעות, הבראה, or הפקדה.
+- Value must be numeric.
 - If missing – return 0.
 
 🛑 קה"ש:
-- Do not extract קה"ש (164). Skip always.
+- Do not extract קה"ש (164). Always skip.
 
 🧮 סה"כ ברוטו:
 - Extract from line containing "ברוטו שוטף" or "סה\"כ ברוטו".
-- Skip if line contains "הפרשים".
+- Skip if line contains "הפרש" or "הפרשים".
+- Must be positive number.
 - If not found – return 0.
 
 🧾 סה"כ ניכויים:
-- Extract from line "סה\"כ ניכויים" or matching 440/ line.
+- Extract from line with "סה\"כ ניכויים" or exact line with code 440/.
+- Return numeric only.
 - If not found – return 0.
 
 🟢 נטו לתשלום:
@@ -80,11 +89,12 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 🎯 נקודות זיכוי:
 - Look for row "נ. זיכוי" in monthly work table.
 - Match to current month code (e.g., "06" for June).
-- Extract value under that exact column.
-- If month not matched or line missing – return 0.
+- Extract value directly under that column.
+- If not found – return 0.
 
 📅 ותק:
-- Extract only from line that includes the phrase "סך וותק מחושב".
+- Extract only from line that includes the exact phrase "סך וותק מחושב".
+- Ignore all other uses of "ותק".
 - If not found – return 0.
 
 🏅 דרגה:
@@ -117,6 +127,7 @@ The response must be valid JSON with no explanations, no formatting issues, and 
 `;
 
 export default prompt;
+
 
 
 
