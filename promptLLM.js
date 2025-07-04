@@ -35,7 +35,7 @@ OVERTIME:
   4. Discard values that equal 1150 or are above 200.
 
 OTHER FIELDS:
-- Hourly rate: extract only from the line with "004/". Ignore "002/".
+- Hourly rate: extract only from the line that contains both "004/" and the phrase "ערך שעה". Do not extract from lines that contain only "ערך שעה" without "004/".
 - Base salary: extract only from the line with code "0002".
 - "גמול חיפוש" (code 1023): extract quantity only.
 - "פרמיה" (code 1210): extract value only.
