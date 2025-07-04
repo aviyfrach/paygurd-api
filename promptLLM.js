@@ -5,6 +5,7 @@ GENERAL RULES:
 - Payslip structures may vary. Do not assume a fixed layout, order, or presence of lines.
 - Always match by component code (e.g., 1125), not by name alone.
 - Extract only from lines that contain valid component codes.
+- Do not return the component code itself (e.g., 1100) as a field value. Discard if that happens.
 - Use only the first appearance of a code – ignore duplicates.
 - If a line contains more than 3 numeric values, treat it as invalid unless specifically matched by a rule.
 - Skip any lines containing the words: "שונות", "גילום", "הפרשים", "רכב", "הבראה".
@@ -14,22 +15,24 @@ GENERAL RULES:
 
 OVERTIME:
 - For overtime 100% (code 1100):
-  1. Locate the line with "1100" and extract the number exactly two numeric values after it – this is the quantity.
-  2. If that fails and the line has exactly 3 numbers, return the middle one.
-  3. If the line has 4 numeric values, reverse the order and take the 3rd number from the left – this is the quantity.
-  4. If the extracted value is greater than 200, discard the field.
+  1. Locate the line with "1100".
+  2. If the line has 3 numeric values – return the middle value (this is the quantity).
+  3. If the line has 4 numeric values – reverse the order and return the third from the left.
+  4. Do not return values that are equal to the code itself (e.g., 1100).
+  5. Do not return the hourly rate or the total value – only the quantity column.
+  6. Discard values above 200.
 
 - For overtime 125% (code 1125):
-  1. Locate the line with "1125" and extract the number exactly two numeric values after it – this is the quantity.
-  2. If that fails and the line has exactly 3 numbers, return the middle one.
-  3. If the line has 4 numeric values, reverse the order and take the 3rd number from the left – this is the quantity.
-  4. If the extracted value is greater than 200, discard the field.
+  1. Same rules as 1100: 3 values → middle, 4 values → third from left (after reverse).
+  2. Never return 1125 as a value. Discard if matched.
+  3. Quantity only. Do not return hourly rate or money value.
+  4. Discard values above 200.
 
 - For overtime 150% (code 1150):
   1. Locate the line with "1150".
-  2. If the line has exactly 3 numeric values before the code – extract the third number from the right (this is the quantity).
-  3. If the line has 4 numeric values – reverse the order and extract the 3rd from the left.
-  4. If the extracted value is greater than 200, discard the field.
+  2. If 3 numeric values before the code – return the third from the right.
+  3. If 4 values – reverse and return third from left.
+  4. Discard values that equal 1150 or are above 200.
 
 OTHER FIELDS:
 - Hourly rate: extract only from the line with "004/". Ignore "002/".
