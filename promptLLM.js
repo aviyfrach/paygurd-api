@@ -1,56 +1,56 @@
 const prompt = `
-הטקסט הבא הוא תלוש שכר בעברית. תחלץ ממנו את הערכים של השדות הבאים לפי ההנחיות הבאות. יש להתחשב בכך שהטבלה מיושרת מימין לשמאל:
+The following text is a Hebrew payslip. Extract the values of the following fields according to these strict instructions. The table is right-to-left aligned:
 
-1. עבור כל שדה שעות נוספות (1100, 1125, 1150) – קח רק את המספר שבעמודת הכמות. זו העמודה האמצעית מבין שלוש: תיאור | כמות | ערך.
-2. לדוגמה: עבור 1125 שעות נוספות, אם מופיע: 2,552.67 | 67.71 | 37.70 – קח את 37.70.
-3. לעולם אל תיקח את הערך לשעה או את הסכום – הם בעמודות הרחוקות משם הרכיב.
-4. שעות נוספות 100% – קוד 1100 בלבד. קח את עמודת הכמות אם קיים. אם לא – התעלם.
-5. שעות נוספות 125% – קוד 1125 בלבד. קח את עמודת הכמות בלבד (למשל 37.70).
-6. שעות נוספות 150% – קוד 1150 בלבד. קח את עמודת הכמות בלבד (למשל 41.50).
-7. ערך שעה – קח מהשורה שמכילה את הקוד "004/" בלבד. לדוגמה: "004/54.17 ערך שעה" = ערך שעה 54.17
-8. שכר יסוד – קח מהשורה עם הקוד "0002" בלבד. לדוגמה: 0002 | שכר יסוד | 2,894.71
-9. תוספות שכר – כל רכיב בין 1000–5999 שאינו 0002 או שעות נוספות – יש לחבר את הסכומים שלו.
-10. גמול חיפוש – קוד 1023. קח את כמות השעות בלבד (המספר בעמודת הכמות).
-11. פרמיה – קוד 1210. קח את הסכום בלבד (עמודת ערך כספי).
-12. כוננות – קוד 1205. קח את הסכום בלבד (עמודת ערך כספי).
-13. ברוטו לפנסיה – קוד 165 או שורה שמתחילה ב-165/. קח את הערך שלצידו.
-14. קה"ש – קוד 164. קח את הסכום לצידו.
-15. סה"כ ברוטו – חפש שורה שמכילה את הביטוי "ברוטו שוטף" או "סה\"כ ברוטו".
-16. סה"כ ניכויים – קח מהשורה "סה\"כ ניכויים" בלבד.
-17. נטו לתשלום – קח מהשורה "סה\"כ לתשלום" בלבד. אל תכלול שדות "קבוע נטו".
-18. נקודות זיכוי – חפש בטבלת חודשי עבודה. אתר את החודש (למשל 04) וקח את הערך מתחתיו בשורת "נ. זיכוי".
-19. ותק – חפש שורה שמכילה "ותק מחושב" בלבד.
-20. דרגה – קח מהשדה "דרגה" בלבד.
-21. אם קיים רק ערך כספי ולא כמות – אל תחזיר את השדה.
-22. כל ערך של שעות נוספות חייב להיות קטן מ־200.
-23. כל סכום כספי חייב להיות ערך חיובי מספרי בלבד.
-24. אל תחזיר שדות אם הקוד אינו מופיע בפועל בטקסט.
-25. התעלם מרכיבים כמו 46T, זקיפות, החזרים, עמלות.
-26. אל תכלול ברוטו אם השדה כולל "הפרשים".
-27. אל תכלול ברוטו שנובע מנסיעות, הבראה, או רכב.
-28. כל פלט חייב להיות JSON שטוח – מפתח:ערך.
-29. כל מפתח חייב להיות בעברית בלבד, לדוגמה: "שעות נוספות 125%", "שכר יסוד", "קה\"ש".
-30. הפלט חייב להיות סגור בסוגריים מסולסלים בלבד.
-31. אל תשתמש בטווחים (כמו 1100–1125) – רק קודים מדויקים.
-32. שעות נוספות – ודא שהקוד מופיע בצמוד לערך. אם חסר – אל תחזיר.
-33. אם רכיב מופיע פעמיים – קח רק את הראשון.
-34. רכיבים של הבראה – אל תכלול כלל.
-35. רכיבים ללא קוד – אל תחלץ.
-36. אם מופיע ערך לשעה או ש"ח ליד ערך – אל תשתמש בו, אלא אם הוגדר אחרת.
-37. עבור רכיבים שלא נמצאים – אל תייצר ערך ריק, פשוט אל תכלול במפתחות.
-38. ודא שכל ערך הוא מסוג מספר בלבד – ללא תווים, ללא מטבע.
-39. אין להחזיר הסברים, הערות או טקסט חופשי.
-40. ודא שכל מפתח בפלט תואם בדיוק לאחד מהרשימה: "שעות נוספות 100%", "שעות נוספות 125%", "שעות נוספות 150%", "שכר יסוד", "תוספות שכר", "סה\"כ ברוטו", "סה\"כ ניכויים", "נטו לתשלום", "ערך שעה", "קה\"ש", "ברוטו לפנסיה", "נקודות זיכוי", "גמול חיפוש", "פרמיה", "כוננות", "ותק", "דרגה".
-41. ברוטו לפנסיה – אל תכלול אם הוא מופיע בשדה רכב או שדה מעורפל.
-42. אם לא הצלחת לזהות רכיב – פשוט דלג עליו.
-43. אל תכלול שדות שכוללים סוגריים, מקפים או תוספות לא תקניות.
-44. אל תשתמש בערכים כפולים – כל שדה מופיע פעם אחת בלבד.
-45. אם אתה לא בטוח בערך מסוים – אל תחזיר אותו בכלל.
-46. הפלט חייב להיות מוכן לקליטה אוטומטית – ללא צורך בפירוש נוסף.
-47. אל תשתמש בראשי תיבות או שמות מקוצרים.
-48. כל מפתח – בעברית תקנית בלבד, ללא קיצורים.
-49. אין להחזיר טקסטים בסגנון "לא נמצא", "שגוי", או "לא זוהה".
-50. JSON בלבד. כל חריגה – תיפסל.
+1. For all overtime fields (1100, 1125, 1150) – extract only the number in the quantity column. It is the middle column: description | quantity | value.
+2. Example: for 1125 overtime, if the line reads: 2,552.67 | 67.71 | 37.70 – extract 37.70.
+3. Never use the hourly rate or the amount column – only extract from the quantity column.
+4. Overtime 100% – code 1100 only. Extract quantity if the code exists. Otherwise, ignore completely.
+5. Overtime 125% – code 1125 only. Extract quantity only (e.g., 37.70).
+6. Overtime 150% – code 1150 only. Extract quantity only (e.g., 41.50).
+7. Hourly rate – extract only from the line containing code "004/". For example: "004/54.17 ערך שעה" → hourly rate is 54.17.
+8. Base salary – extract only from the line with code "0002".
+9. Salary additions – sum the values of all components with codes between 1000–5999, excluding 0002 and overtime codes.
+10. "גמול חיפוש" – code 1023. Extract the quantity only.
+11. "פרמיה" – code 1210. Extract the value only (right column).
+12. "כוננות" – code 1205. Extract the value only.
+13. Gross for pension – code 165 or any line starting with "165/". Extract the adjacent number.
+14. Keren Hishtalmut (קופת השתלמות, "קה\"ש") – extract from line with code 164.
+15. Total gross – find the line containing "ברוטו שוטף" or "סה\"כ ברוטו" and extract the number.
+16. Total deductions – extract only from the line with "סה\"כ ניכויים".
+17. Net pay – extract only from the line with "סה\"כ לתשלום". Do not include "קבוע נטו".
+18. Tax credit points – look inside the monthly table. Locate the relevant month (e.g., 04) and extract the value underneath "נ. זיכוי".
+19. Seniority – extract only from the line containing "ותק מחושב".
+20. Rank – extract from the field labeled "דרגה" only.
+21. If a component has only a monetary value and no quantity – do not return that field.
+22. All overtime values must be less than 200.
+23. All monetary values must be positive numeric values only.
+24. Do not return any fields if the code does not appear in the text.
+25. Ignore components such as 46T, זקיפות, refunds, or commissions.
+26. Do not include gross values from lines labeled "הפרשים".
+27. Do not include gross lines related to travel, vacation, or vehicle.
+28. Output must be a flat JSON object: key:value pairs only.
+29. All keys must be in Hebrew only, e.g., "שעות נוספות 125%", "שכר יסוד", "קה\"ש".
+30. Output must be enclosed in curly braces only.
+31. Never use ranges like 1100–1125 – use exact codes only.
+32. For overtime – make sure the code appears on the same line as the value. If it’s missing, skip the field.
+33. If a component appears more than once – take only the first instance.
+34. Do not extract components related to "הבראה".
+35. Do not extract components that have no code at all.
+36. If a number has a currency symbol (₪) or hourly notation – ignore it unless defined otherwise.
+37. For missing components – do not return an empty or null value. Just omit the key.
+38. Ensure all values are numeric – no symbols, no text.
+39. Do not return explanations, comments, or free text.
+40. Only use the following keys in the output: "שעות נוספות 100%", "שעות נוספות 125%", "שעות נוספות 150%", "שכר יסוד", "תוספות שכר", "סה\"כ ברוטו", "סה\"כ ניכויים", "נטו לתשלום", "ערך שעה", "קה\"ש", "ברוטו לפנסיה", "נקודות זיכוי", "גמול חיפוש", "פרמיה", "כוננות", "ותק", "דרגה".
+41. Gross for pension – do not include if it appears in vehicle or unclear fields.
+42. If you cannot confidently identify a field – skip it.
+43. Do not include keys with parentheses, hyphens, or non-standard labels.
+44. Do not repeat values – each key appears only once.
+45. If uncertain about a value – do not include it at all.
+46. Output must be ready for machine parsing – no interpretation required.
+47. Do not use abbreviations or short names.
+48. All keys must be in fully spelled-out, proper Hebrew.
+49. Do not return text like "not found", "error", or "unrecognized".
+50. Output must be strict JSON. Any deviation will be rejected.
 `;
 
 export default prompt;
