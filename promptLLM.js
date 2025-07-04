@@ -3,55 +3,54 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 
 GENERAL RULES:
 - Payslip structures may vary. Do not assume a fixed layout, order, or presence of lines.
-- Always match by component code (e.g., 1125), not by name alone.
-- Extract only from lines that contain valid component codes.
-- Never extract a value unless the code (e.g., 1100, 1125, 1150) appears in the same line.
-- Do not return the component code itself (e.g., 1100) as a field value. Discard if that happens.
-- Use only the first appearance of a code – ignore duplicates.
-- If a line contains more than 3 numeric values, treat it as invalid unless specifically matched by a rule.
-- Skip any lines containing the words: "שונות", "גילום", "הפרשים", "רכב", "הבראה".
-- All extracted values must be clean numbers (float), without ₪, commas, units, or spaces.
-- If a value is missing or invalid – do not return 0 or null. Omit the field entirely.
-- Do not return any English keys. Output keys must be in proper Hebrew only.
+- Extract only if the required code (e.g., 1100, 1125, 1150) appears in the same line as the value.
+- Never extract values from adjacent or unrelated lines.
+- Never extract the component code itself as a value (e.g., do not return 1100).
+- Use only the first appearance of each code. Ignore duplicates.
+- Skip any line with more than 4 numeric values unless explicitly required.
+- Skip any line containing "שונות", "גילום", "הפרשים", "רכב", "הבראה".
+- All values must be numeric only (float) without ₪, symbols, or units.
+- Do not return 0 or null for missing fields. Omit them completely.
+- All keys must be in correct Hebrew only. No English or abbreviations.
 
-OVERTIME:
-- For overtime 100% (code 1100):
-  1. Locate the line with "1100".
-  2. If the line has 3 numeric values – return the middle value (quantity).
-  3. If the line has 4 numeric values – reverse the order and return the third from the left.
-  4. Do not return the hourly rate or total value – only the quantity.
-  5. Do not return values that equal the code itself.
-  6. Discard values above 200.
+OVERTIME (שעות נוספות):
+- For 100% (code 1100):
+  1. Line must contain "1100".
+  2. If line has 3 numbers → return the middle one.
+  3. If line has 4 numbers → reverse order and return third from the left.
+  4. Value must be a quantity (not hourly rate or total).
+  5. Value must be under 200.
 
-- For overtime 125% (code 1125):
-  1. Same logic as 1100. Must be in same line as code.
-  2. 3 values → take middle. 4 values → reverse and take third from left.
-  3. Quantity only – never hourly rate or total value.
-  4. Skip values over 200.
+- For 125% (code 1125):
+  1. Line must contain "1125".
+  2. Use same rules as above (3 → middle, 4 → third from left reversed).
+  3. Do not extract rate or total. Only quantity.
+  4. Must be < 200.
 
-- For overtime 150% (code 1150):
-  1. Must be on same line as 1150. Do not extract from nearby or next lines.
-  2. If 3 values – take third from right. If 4 values – reverse and take third from left.
-  3. Discard values that equal the code or are over 200.
+- For 150% (code 1150):
+  1. Must be in same line as "1150".
+  2. Same logic for choosing value.
+  3. Never extract value if code is missing in that line.
+  4. Skip if value = 1150 or > 200.
 
 OTHER FIELDS:
-- Hourly rate: extract only from line that includes both "004/" and "ערך שעה".
+- Hourly rate: extract only from line that contains both "004/" and "ערך שעה".
 - Base salary: from line with code "0002" only.
-- "גמול חיפוש" (code 1023): extract quantity from the same line as code 1023. Never extract from unrelated fields like ותק.
+- "גמול חיפוש" (1023): extract quantity only from line containing "1023". Do not use other lines.
 - "פרמיה" (1210): extract value only.
 - "כוננות" (1205): extract value only.
-- Pension gross: extract from code 165 or "165/", unless related to רכב.
-- Do not extract קה"ש (code 164).
+- Pension gross (165): extract from line with 165 only. Skip if related to רכב.
+- Do not extract קה"ש (164).
 - Do not include additions (codes 1000–5999).
-- Gross total: from line "ברוטו שוטף" or "סה\"כ ברוטו", but skip if includes "הפרשים".
-- Deductions: from "סה\"כ ניכויים".
-- Net: from "סה\"כ לתשלום", not "קבוע נטו".
+- Gross total: from "ברוטו שוטף" or "סה\"כ ברוטו" only. Skip if line includes "הפרשים".
+- Deductions: from "סה\"כ ניכויים" only.
+- Net pay: from "סה\"כ לתשלום", not "קבוע נטו".
 - Tax credit points ("נקודות זיכוי"):
-  1. Locate row with "נ. זיכוי" in the table of months.
-  2. Identify the column matching the current work month (e.g., "06").
-  3. Extract the number directly under that column only. Do not take from totals or wrong month.
-- Seniority: extract only from "ותק מחושב".
-- Rank: only from "דרגה:" (e.g., "דרגה: 18") – extract the number only.
+  1. Find row "נ. זיכוי" in monthly table.
+  2. Find the column matching the work month (e.g., "06" for June).
+  3. Extract the value under that exact column only. Never take from summary or wrong month.
+- Seniority ("ותק"): only from line containing "ותק מחושב".
+- Rank ("דרגה"): from line starting with "דרגה:" → extract number only.
 
 OUTPUT:
 Return only the following keys (in Hebrew):
@@ -74,8 +73,9 @@ Return only the following keys (in Hebrew):
   "דרגה"
 ]
 
-- Output must be valid flat JSON only. Do not include comments, explanations, or any surrounding text.
+- Output must be valid flat JSON. Do not include explanations or any text outside the JSON.
 `;
 
 export default prompt;
+
 
