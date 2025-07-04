@@ -16,17 +16,20 @@ OVERTIME:
 - For overtime 100% (code 1100):
   1. Locate the line with "1100" and extract the number exactly two numeric values after it – this is the quantity.
   2. If that fails and the line has exactly 3 numbers, return the middle one.
-  3. If the extracted value is greater than 200, discard the field.
+  3. If the line has 4 numeric values, reverse the order and take the 3rd number from the left – this is the quantity.
+  4. If the extracted value is greater than 200, discard the field.
 
 - For overtime 125% (code 1125):
   1. Locate the line with "1125" and extract the number exactly two numeric values after it – this is the quantity.
   2. If that fails and the line has exactly 3 numbers, return the middle one.
-  3. If the line has 4 numeric values including code, reverse the order and take the 3rd number from left – that is the quantity.
+  3. If the line has 4 numeric values, reverse the order and take the 3rd number from the left – this is the quantity.
   4. If the extracted value is greater than 200, discard the field.
 
 - For overtime 150% (code 1150):
-  1. Same as above – try two values after the code, fallback to middle of 3, or third from left if line has 4 values.
-  2. Discard if over 200.
+  1. Locate the line with "1150".
+  2. If the line has exactly 3 numeric values before the code – extract the third number from the right (this is the quantity).
+  3. If the line has 4 numeric values – reverse the order and extract the 3rd from the left.
+  4. If the extracted value is greater than 200, discard the field.
 
 OTHER FIELDS:
 - Hourly rate: extract only from the line with "004/". Ignore "002/".
@@ -69,4 +72,3 @@ Return only the following keys (in Hebrew):
 `;
 
 export default prompt;
-
