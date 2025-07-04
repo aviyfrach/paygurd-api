@@ -3,7 +3,7 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 
 - Payslip structures may vary. Do not assume the layout, order, or presence of specific lines. Always rely on the component code or key phrase itself, not position.
 - For overtime 100% (code 1100): extract only from the quantity column (middle column). If the code is not found – do not return this field.
-- For overtime 125% (code 1125): extract only the number closest to the code 1125 in the same line, which appears as the third number from the right (i.e., description | quantity | value). Always extract the middle number – the quantity – and ignore the amount or hourly rate.
+- For overtime 125% (code 1125): find the line that contains "1125" and extract the third number from the right (e.g., סכום | ערך לשעה | כמות). That number is the quantity. Ignore all other values.
 - For overtime 150% (code 1150): extract only from the quantity column. Do not return 0 unless the code truly does not exist.
 - For hourly rate: extract only from the line with "004/". Ignore "002/" which is the daily rate.
 - For base salary: extract only from the line with code "0002".
