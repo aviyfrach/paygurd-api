@@ -10,45 +10,43 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 6. If a field appears multiple times – extract only the first valid line that is not part of a "הפרש" or adjustment section.
 7. Completely ignore any line that includes the word "הפרש" or "הפרשים".
 8. Ignore lines that contain a date range, such as "01.25–04.25".
-9. If the line contains more than 4 numeric values – discard it unless explicitly valid.
-10. Do not extract from rows that contain נסיעות, רכב, הבראה, זקיפות or unclear labels.
-11. Never extract negative values.
-12. All field keys must be in Hebrew only.
-13. All fields in the final output must be present – if a value is not found, return 0 for that key.
-14. Never extract values that are equal to the code itself (e.g., 1100 as value).
-15. All values must be rounded to two decimal places.
-16. All numeric fields must be valid positive numbers under 200 (for quantities).
+9. If the line contains more than 4 numeric values – discard it unless explicitly valid (see שעות נוספות below).
+10. All field keys must be in Hebrew only.
+11. All fields in the final output must be present – if a value is not found, return 0 for that key.
+12. Never extract values that are equal to the code (e.g., 1100 as value).
+13. Always validate the value is below 200 for any overtime quantity field.
+14. Do not extract from rows that contain נסיעות, רכב, הבראה, זקיפות or unclear labels.
+15. Each key must appear only once, and always with a numeric value.
+16. Round all numbers to two decimal places.
 
 🕒 שעות נוספות:
 - שעות נוספות 100% (code 1100):
-  - חובה שהשורה תכיל את הקוד "1100".
-  - פסול שורה אם היא מכילה את המילים "הפרש", "הפרשים", טווח תאריכים, או מילים כמו "כוננות", "משמרת".
-  - אם בשורה יש 3 ערכים מספריים – קח את האמצעי **רק אם הוא בין 1 ל־200**.
-  - אם בשורה יש 4 ערכים – הפוך את הסדר וקח את השלישי משמאל **רק אם הוא קטן מ־200**.
-  - אל תיקח ערך שהוא סכום כולל או ערך לשעה (למשל 51.55).
-  - אל תיקח ערך הזהה לערך השעה שמופיע בשדה "ערך שעה".
-  - אם לא עומד בתנאים – החזר 0.
+  - Must appear in same line as value.
+  - If 3 values → return the middle.
+  - If 4 values → reverse line and return third from left.
+  - If 5 values → discard (not supported for 1100).
+  - Value must be < 200, not a rate, not from "הפרשים" or with date range.
+  - If not found – return 0.
 
 - שעות נוספות 125% (code 1125):
-  - אותו כלל בדיוק כמו 1100.
-  - ודא שהקוד מופיע באותה שורה.
-  - קח את הערך האמצעי **רק אם הוא נראה כמו כמות שעות (1–200)**.
-  - אל תיקח סכומים, סכומים לשעה או ערכים דומים ל־"ערך שעה".
-  - פסול שורות עם יותר מ־4 ערכים או מבנה שגוי.
+  - If 5 numeric values in line – return the rightmost value (first column from right) = quantity.
+  - If 3 values – return the middle.
+  - If 4 values – reverse line and return third from left.
+  - Skip invalid or adjustment rows.
+  - Must be under 200.
+  - If not found – return 0.
 
 - שעות נוספות 150% (code 1150):
-  - אותו כלל בדיוק כמו 125%.
-  - אל תיקח ערך אם הוא שווה לסכום כספי או לסכום נטו של רכיב.
-  - הקפד להחזיר אך ורק את כמות השעות (לדוגמה 47.55), לא את הערך הכספי (למשל 2,652.27).
-  - אם לא נמצא ערך מתאים – החזר 0.
+  - Same logic as 1125.
+  - First valid non-adjustment line only.
+  - Must be numeric and < 200.
+  - If not found – return 0.
 
 🟨 ערך שעה:
-- חפש שורה שמכילה גם את המילה "004" וגם את הביטוי "ערך שעה".
-- מותר שהשורה תהיה בטבלת נתוני עזר, גם אם לא בטבלת השכר הראשית.
-- אסור שהשורה תכלול "002" או "ערך יום".
-- הערך חייב להיות מספר בין 30 ל־200.
-- קח את השורה התקפה הראשונה בלבד.
-- אם לא נמצא ערך תקף – החזר 0.
+- Extract only from line that includes both "004/" and "ערך שעה".
+- Do not extract from lines with "002" or "ערך יום".
+- Value must be between 30 and 200.
+- If not found – return 0.
 
 💰 שכר יסוד:
 - Extract from line with code "0002".
@@ -96,8 +94,8 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 
 🎯 נקודות זיכוי:
 - Locate the row "נ. זיכוי" in the monthly summary table.
-- Match the value in the column with the exact month number (e.g., "04" for April).
-- Value must be numeric and between 0–12.
+- Match value under column matching current month number (e.g., "04" for April).
+- Value must be numeric between 0–12.
 - If not found – return 0.
 
 📅 ותק:
