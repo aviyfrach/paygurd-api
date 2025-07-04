@@ -9,9 +9,9 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 5. Do not return the component code itself (e.g., 1100) as value.
 6. If a field appears multiple times – extract only the first valid line that is not part of a "הפרש" or adjustment section.
 7. Completely ignore any line that includes the word "הפרש" or "הפרשים".
-8. Ignore lines that contain a date range, such as "01.25–04.25", "03.25–06.25", or any DD.MM–DD.MM format.
-9. Discard any line where the code appears with a date range or more than 4 numbers.
-10. Do not extract from lines that contain the words "כוננות", "משמרת", "נסיעות", "רכב", "הבראה", "זקיפות", or any unclear labels.
+8. Ignore lines that contain a date range, such as "01.25–04.25".
+9. If the line contains more than 4 numeric values – discard it unless explicitly valid.
+10. Do not extract from rows that contain נסיעות, רכב, הבראה, זקיפות or unclear labels.
 11. Never extract negative values.
 12. All field keys must be in Hebrew only.
 13. All fields in the final output must be present – if a value is not found, return 0 for that key.
@@ -20,7 +20,6 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 16. All numeric fields must be valid positive numbers under 200 (for quantities).
 
 🕒 שעות נוספות:
-
 - שעות נוספות 100% (code 1100):
   - חובה שהשורה תכיל את הקוד "1100".
   - פסול שורה אם היא מכילה את המילים "הפרש", "הפרשים", טווח תאריכים (כמו "01.25–04.25"), או מילים כמו "כוננות", "משמרת".
@@ -43,10 +42,12 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
   - אם אין שורה תקפה – החזר 0.
 
 🟨 ערך שעה:
-- Extract only from the first line that includes both "004/" and "ערך שעה".
-- Do not extract from lines with "002" or "ערך יום".
-- Value must be between 30 and 200.
-- If not found – return 0.
+- חפש שורה שמכילה גם את המילה "004" וגם את הביטוי "ערך שעה".
+- מותר שהשורה תהיה בטבלת נתוני עזר, גם אם לא בטבלת השכר הראשית.
+- אסור שהשורה תכלול "002" או "ערך יום".
+- הערך חייב להיות מספר בין 30 ל־200.
+- קח את השורה התקפה הראשונה בלבד.
+- אם לא נמצא ערך תקף – החזר 0.
 
 💰 שכר יסוד:
 - Extract from line with code "0002".
@@ -54,7 +55,7 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 
 📌 גמול חיפוש:
 - Extract quantity from line containing code "1023".
-- Must not be from a line that includes "הפרש" or a date range.
+- Must not be from adjustment section.
 - If not found – return 0.
 
 📌 פרמיה:
