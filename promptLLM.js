@@ -7,39 +7,42 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 3. All returned fields must have numeric values (float), without any currency, symbols, or text.
 4. Do not return values from unrelated lines, summaries, headers or adjacent items.
 5. Do not return the component code itself (e.g., 1100) as value.
-6. If a field appears multiple times – extract only the first.
-7. If the line contains more than 4 numeric values – discard it unless explicitly valid.
-8. All field keys must be in Hebrew only.
-9. All fields in the final output must be present – if a value is not found, return 0 for that key.
-10. Never extract values that are equal to the code (e.g., 1100 as value).
-11. Always validate the value is below 200 for any overtime quantity field.
-12. Completely ignore any line that includes the word "הפרש" or "הפרשים" – even if it includes a valid code like 1100.
-13. Do not extract any values from "נסיעות", "רכב", "הבראה", "זקיפות", or any field with unclear or ambiguous label.
-14. Each key must be returned exactly once, and always with a numeric value.
+6. If a field appears multiple times – extract only the first valid line that is not part of a "הפרש" or adjustment section.
+7. Completely ignore any line that includes the word "הפרש" or "הפרשים".
+8. Ignore lines that contain a date range, such as "01.25–04.25".
+9. If the line contains more than 4 numeric values – discard it unless explicitly valid.
+10. All field keys must be in Hebrew only.
+11. All fields in the final output must be present – if a value is not found, return 0 for that key.
+12. Never extract values that are equal to the code (e.g., 1100 as value).
+13. Always validate the value is below 200 for any overtime quantity field.
+14. Do not extract from rows that contain נסיעות, רכב, הבראה, זקיפות or unclear labels.
+15. Each key must appear only once, and always with a numeric value.
+16. Round all numbers to two decimal places.
 
 🕒 שעות נוספות:
 - שעות נוספות 100% (code 1100):
-  - Line must contain "1100".
-  - If line has 3 numbers → return middle.
-  - If line has 4 → reverse and return third from left.
-  - Must be numeric, < 200, and not a rate or total.
-  - Ignore if value is near hourly/daily rate.
+  - Must appear in same line as value.
+  - Line must contain 3 or 4 numeric values.
+  - If 3 values → return the middle.
+  - If 4 values → reverse line and return third from left.
+  - Value must be < 200, not a rate, not from "הפרשים" or with date range.
   - If not found – return 0.
 
 - שעות נוספות 125% (code 1125):
-  - Same logic: only from line with "1125".
-  - Use same pattern (3 → middle, 4 → reversed third).
-  - No guesswork – return 0 if invalid or not present.
+  - Same logic as above with code 1125.
+  - First valid non-adjustment line only.
+  - If not found – return 0.
 
 - שעות נוספות 150% (code 1150):
-  - Only from line with "1150".
-  - Same extraction logic.
-  - Value must be numeric, under 200.
-  - If line includes "כוננות" or other components – discard.
+  - Same logic as above with code 1150.
+  - If multiple 1150 lines found, take only the first valid non-adjustment one.
+  - If not found – return 0.
 
 🟨 ערך שעה:
 - Extract only from line that includes both "004/" and "ערך שעה".
-- Must not be from line with "002" or "ערך יום".
+- Do not extract from lines with "002" or "ערך יום".
+- Value must be between 30 and 200.
+- Use only the first valid line.
 - If not found – return 0.
 
 💰 שכר יסוד:
@@ -48,57 +51,57 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 
 📌 גמול חיפוש:
 - Extract quantity from line containing code "1023".
-- Only numeric quantity column.
+- Must not be from adjustment section.
 - If not found – return 0.
 
 📌 פרמיה:
 - Extract value from code 1210.
-- Only extract value column (not quantity).
+- Only the value column.
 - If missing – return 0.
 
 📌 כוננות:
 - Extract value from code 1205.
-- Only from value column.
+- Only the value column.
 - If missing – return 0.
 
 🏦 ברוטו לפנסיה:
-- Extract from line containing code "165" or "165/".
-- Do not extract if line contains רכב, נסיעות, הבראה, or הפקדה.
-- Value must be numeric.
+- Extract from line with code "165" or starting with "165/".
+- Skip if line contains רכב, נסיעות, הבראה, or הפקדה.
+- Must be numeric.
 - If missing – return 0.
 
 🛑 קה"ש:
-- Do not extract קה"ש (164). Always skip.
+- Always skip קה"ש (164).
 
 🧮 סה"כ ברוטו:
 - Extract from line containing "ברוטו שוטף" or "סה\"כ ברוטו".
 - Skip if line contains "הפרש" or "הפרשים".
-- Must be positive number.
+- Must be a positive number.
 - If not found – return 0.
 
 🧾 סה"כ ניכויים:
-- Extract from line with "סה\"כ ניכויים" or exact line with code 440/.
-- Return numeric only.
+- Extract from line with "סה\"כ ניכויים" or line with code 440/.
+- Must be numeric.
 - If not found – return 0.
 
 🟢 נטו לתשלום:
 - From line with "סה\"כ לתשלום".
-- Never use "קבוע נטו" or variants.
-- If missing – return 0.
+- Never use "קבוע נטו" or variations.
+- If not found – return 0.
 
 🎯 נקודות זיכוי:
-- Look for row "נ. זיכוי" in monthly work table.
-- Match to current month code (e.g., "06" for June).
-- Extract value directly under that column.
+- Locate the row "נ. זיכוי" in the monthly summary table.
+- Match value under column matching current month number (e.g., "04" for April).
+- Value must be numeric between 0–12.
 - If not found – return 0.
 
 📅 ותק:
-- Extract only from line that includes the exact phrase "סך וותק מחושב".
-- Ignore all other uses of "ותק".
+- Extract only from line containing exact phrase "סך וותק מחושב".
+- Ignore any other "ותק".
 - If not found – return 0.
 
 🏅 דרגה:
-- Extract from line starting with "דרגה:" or field named "דרגה".
+- Extract from line starting with "דרגה:" or containing label "דרגה".
 - Must be numeric only.
 - If missing – return 0.
 
@@ -127,6 +130,7 @@ The response must be valid JSON with no explanations, no formatting issues, and 
 `;
 
 export default prompt;
+
 
 
 
