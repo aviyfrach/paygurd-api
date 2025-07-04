@@ -10,14 +10,18 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 6. If a field appears multiple times – extract only the first valid line that is not part of a "הפרש" or adjustment section.
 7. Completely ignore any line that includes the word "הפרש" or "הפרשים".
 8. Ignore lines that contain a date range, such as "01.25–04.25", "03.25–06.25", or any DD.MM–DD.MM format.
-9. If the line contains more than 4 numeric values – discard it unless explicitly valid.
-10. All field keys must be in Hebrew only.
-11. All fields in the final output must be present – if a value is not found, return 0 for that key.
-12. Never extract values that are equal to the code (e.g., 1100 as value).
-13. Always validate the value is below 200 for any overtime quantity field.
-14. Do not extract from rows that contain נסיעות, רכב, הבראה, זקיפות or unclear labels.
-15. Each key must appear only once, and always with a numeric value.
-16. Round all numbers to two decimal places.
+9. Discard any line where the code (e.g., 1100) appears in combination with a date range.
+10. If the line contains more than 4 numeric values – discard it unless explicitly valid.
+11. All field keys must be in Hebrew only.
+12. All fields in the final output must be present – if a value is not found, return 0 for that key.
+13. Never extract values that are equal to the code (e.g., 1100 as value).
+14. Always validate the value is below 200 for any overtime quantity field.
+15. Do not extract from rows that contain נסיעות, רכב, הבראה, זקיפות or unclear labels.
+16. Each key must appear only once, and always with a numeric value.
+17. Round all numbers to two decimal places.
+18. Do not extract negative values under any circumstances.
+19. If multiple lines match the same code – return only the first valid non-adjustment line.
+20. Any line that contains too many decimals (e.g., 4+ float numbers) is likely corrupted – discard.
 
 🕒 שעות נוספות:
 - שעות נוספות 100% (code 1100):
@@ -37,6 +41,7 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 - שעות נוספות 150% (code 1150):
   - Same logic as above with code 1150.
   - If multiple 1150 lines exist, extract only the first valid one that is not in a "הפרשים" or date range line.
+  - Must contain 3 or 4 numeric values.
   - If not found – return 0.
 
 🟨 ערך שעה:
