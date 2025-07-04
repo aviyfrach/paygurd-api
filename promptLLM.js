@@ -37,7 +37,7 @@ OVERTIME:
 OTHER FIELDS:
 - Hourly rate: extract only from the line that contains both "004/" and the phrase "ערך שעה". Do not extract from lines that contain only "ערך שעה" without "004/".
 - Base salary: extract only from the line with code "0002".
-- "גמול חיפוש" (code 1023): extract quantity only.
+- "גמול חיפוש" (code 1023): extract only the quantity number that appears on the same line as 1023. Never extract from unrelated lines like "ותק".
 - "פרמיה" (code 1210): extract value only.
 - "כוננות" (code 1205): extract value only.
 - Pension gross: extract only from line with code 165 or "165/", unless related to vehicle.
@@ -46,7 +46,7 @@ OTHER FIELDS:
 - Total gross: extract from "ברוטו שוטף" or "סה\"כ ברוטו". Skip if includes "הפרשים".
 - Total deductions: extract from "סה\"כ ניכויים".
 - Net pay: extract from "סה\"כ לתשלום". Ignore "קבוע נטו".
-- Tax credit points: from row "נ. זיכוי" under correct month.
+- Tax credit points: locate the row titled "נ. זיכוי" under the relevant work month (e.g., 06 for June) and extract the number directly beneath that column only. Never extract a number that belongs to a different month or summary section.
 - Seniority: only from line with "ותק מחושב".
 - Rank: only from "דרגה:" → extract numeric value.
 
@@ -75,3 +75,4 @@ Return only the following keys (in Hebrew):
 `;
 
 export default prompt;
+
