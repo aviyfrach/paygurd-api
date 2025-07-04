@@ -21,31 +21,32 @@ OVERTIME:
 - For overtime 125% (code 1125):
   1. Locate the line with "1125" and extract the number exactly two numeric values after it – this is the quantity.
   2. If that fails and the line has exactly 3 numbers, return the middle one.
-  3. If the extracted value is greater than 200, discard the field.
+  3. If the line has 4 numeric values including code, reverse the order and take the 3rd number from left – that is the quantity.
+  4. If the extracted value is greater than 200, discard the field.
 
 - For overtime 150% (code 1150):
-  1. Locate the line with "1150" and extract the number exactly two numeric values after it – this is the quantity.
-  2. If that fails and the line has exactly 3 numbers, return the middle one.
-  3. If the extracted value is greater than 200, discard the field.
+  1. Same as above – try two values after the code, fallback to middle of 3, or third from left if line has 4 values.
+  2. Discard if over 200.
 
 OTHER FIELDS:
-- Hourly rate: extract only from the line with "004/". Ignore "002/" which is the daily rate.
+- Hourly rate: extract only from the line with "004/". Ignore "002/".
 - Base salary: extract only from the line with code "0002".
 - "גמול חיפוש" (code 1023): extract quantity only.
 - "פרמיה" (code 1210): extract value only.
 - "כוננות" (code 1205): extract value only.
 - Pension gross: extract only from line with code 165 or "165/", unless related to vehicle.
 - Do not extract "קה\"ש" (code 164) – skip completely.
-- Do not include salary additions (codes 1000–5999) – skip entirely.
-- Total gross: extract from "ברוטו שוטף" or "סה\"כ ברוטו" lines only. Skip lines with "הפרשים".
-- Total deductions: extract only from "סה\"כ ניכויים".
-- Net pay: extract only from "סה\"כ לתשלום". Ignore "קבוע נטו" or similar.
-- Tax credit points: extract from the monthly row "נ. זיכוי" under the correct month (e.g., 04).
-- Seniority: extract only from the line that contains "ותק מחושב". Do not confuse with grade or title.
-- Rank: extract only the number from the line starting with "דרגה:". For example, "דרגה: 17 14.05.2023" → return 17.
+- Do not include salary additions (codes 1000–5999).
+- Total gross: extract from "ברוטו שוטף" or "סה\"כ ברוטו". Skip if includes "הפרשים".
+- Total deductions: extract from "סה\"כ ניכויים".
+- Net pay: extract from "סה\"כ לתשלום". Ignore "קבוע נטו".
+- Tax credit points: from row "נ. זיכוי" under correct month.
+- Seniority: only from line with "ותק מחושב".
+- Rank: only from "דרגה:" → extract numeric value.
 
 OUTPUT:
-- Return a valid flat JSON object using only the keys below:
+Return only the following keys (in Hebrew):
+
 [
   "שעות נוספות 100%",
   "שעות נוספות 125%",
@@ -63,7 +64,9 @@ OUTPUT:
   "ותק",
   "דרגה"
 ]
-- Do not include comments, explanations, or any non-JSON output.
+
+- Output must be valid flat JSON only. Do not include comments, explanations, or any surrounding text.
 `;
 
 export default prompt;
+
