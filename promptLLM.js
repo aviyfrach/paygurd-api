@@ -101,9 +101,11 @@ You will receive a Hebrew payslip as plain text. Your task is to extract specifi
 - אם לא נמצאה התאמה – החזר 0.
 
 🏅 דרגה:
-- שלוף משורה שמכילה את הביטוי "דרגה:" או "דרגה".
-- הערך המוחזר חייב להיות מספר (או תאריך בפורמט תקני).
-- אם לא נמצא ערך חוקי – החזר 0.
+- אתר את השורה המכילה את המילה "דרגה:" בטבלת הנתונים האישיים.
+- השורה מכילה שלושה טורים: [כותרת] [טור אמצעי – ערך הדרגה] [טור שמאלי – תאריך].
+- שלוף אך ורק את הערך מהטור האמצעי (לדוגמה: אם כתוב "דרגה: 17 14.05.2023" → יש להחזיר 17).
+- הערך חייב להיות מספר חוקי.
+- אם לא נמצאה התאמה – החזר 0.
 
 📤 FINAL OUTPUT FORMAT:
 Return all fields below, even if their value is 0:
@@ -130,6 +132,7 @@ The response must be valid JSON with no explanations, no formatting issues, and 
 `;
 
 export default prompt;
+
 
 
 
