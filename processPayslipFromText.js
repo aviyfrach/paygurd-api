@@ -1,5 +1,5 @@
 import express from 'express';
-import { payslipPrompt } from './promptLLM.js';
+import prompt from './promptLLM.js'; // ← ייבוא מתוקן
 import OpenAI from 'openai';
 
 const router = express.Router();
@@ -17,7 +17,7 @@ router.post('/', async (req, res) => {
 
   try {
     const messages = [
-      { role: 'system', content: payslipPrompt },
+      { role: 'system', content: prompt },
       { role: 'user', content: raw_text },
     ];
 
