@@ -131,8 +131,3 @@ The response must be valid JSON with no explanations, no formatting issues, and 
 `;
 
 export default prompt;
-
-The response must be valid JSON with no explanations, no formatting issues, and no text outside the object.
-`;
-
-export default prompt;
