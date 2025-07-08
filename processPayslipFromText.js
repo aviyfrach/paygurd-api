@@ -1,5 +1,5 @@
 import express from 'express';
-import { payslipPrompt } from './utils/promptLLM.js';
+import { payslipPrompt } from './promptLLM.js';
 import OpenAI from 'openai';
 
 const router = express.Router();
