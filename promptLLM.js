@@ -129,5 +129,3 @@ Return all fields below, even if their value is 0:
 
 The response must be valid JSON with no explanations, no formatting issues, and no text outside the object.
 `;
-export const payslipPrompt = prompt;
-
