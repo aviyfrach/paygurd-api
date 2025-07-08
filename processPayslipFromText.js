@@ -5,7 +5,7 @@ import OpenAI from "openai";
 const router = express.Router();
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // ודא שהמפתח מוגדר בסביבת הריצה שלך
+  apiKey: process.env.OPENAI_API_KEY,  // ודא שהמפתח מוגדר בסביבת הריצה שלך
 });
 
 router.post("/", async (req, res) => {
@@ -28,7 +28,6 @@ router.post("/", async (req, res) => {
     });
 
     const parsed = JSON.parse(completion.choices[0].message.content);
-
     return res.json(parsed);
   } catch (error) {
     console.error("Error in processPayslipFromText:", error.message);
