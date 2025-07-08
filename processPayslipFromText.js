@@ -1,11 +1,11 @@
 import express from "express";
-import { payslipPrompt } from "./promptLLM.js";
+import prompt from "./promptLLM.js";
 import OpenAI from "openai";
 
 const router = express.Router();
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,  // ודא שהמפתח מוגדר בסביבת הריצה שלך
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 router.post("/", async (req, res) => {
@@ -17,7 +17,7 @@ router.post("/", async (req, res) => {
     }
 
     const messages = [
-      { role: "system", content: payslipPrompt },
+      { role: "system", content: prompt },
       { role: "user", content: raw_text },
     ];
 
@@ -37,3 +37,4 @@ router.post("/", async (req, res) => {
 });
 
 export default router;
+
