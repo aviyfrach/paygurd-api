@@ -1,4 +1,4 @@
-const prompt = `
+export const payslipPrompt = `
 You will receive a Hebrew payslip as plain text. Your task is to extract specific financial values as a flat JSON with fixed Hebrew keys. The table is aligned right-to-left. Follow these strict rules:
 
 🟩 GENERAL INSTRUCTIONS:
@@ -130,4 +130,3 @@ Return all fields below, even if their value is 0:
 The response must be valid JSON with no explanations, no formatting issues, and no text outside the object.
 `;
 
-export default prompt;
