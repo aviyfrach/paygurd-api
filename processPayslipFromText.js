@@ -16,9 +16,15 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Missing raw_text in request body" });
     }
 
+    // ✂️ חיתוך טקסט ל־7000 תווים כדי למנוע חריגה מהמגבלת טוקנים של GPT-4
+    const MAX_TEXT_LENGTH = 7000;
+    const safeText = raw_text.length > MAX_TEXT_LENGTH
+      ? raw_text.slice(0, MAX_TEXT_LENGTH)
+      : raw_text;
+
     const messages = [
       { role: "system", content: payslipPrompt },
-      { role: "user", content: raw_text },
+      { role: "user", content: safeText },
     ];
 
     const completion = await openai.chat.completions.create({
