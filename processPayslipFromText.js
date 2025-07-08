@@ -28,4 +28,11 @@ router.post('/', async (req, res) => {
     });
 
     const parsed = JSON.parse(completion.choices[0].message.content);
-    res.json(
+    res.json(parsed);
+  } catch (error) {
+    console.error('❌ שגיאה בעיבוד תלוש:', error);
+    res.status(500).json({ error: 'Failed to process payslip' });
+  }
+});
+
+export default router;
